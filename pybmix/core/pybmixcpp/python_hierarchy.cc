@@ -18,6 +18,7 @@
 #include "py_global.h"
 #include "pybind11/stl.h"
 #include "pybind11/eigen.h"
+#include "opaque.h"
 
 void synchronize_cpp_to_py_state(const std::mt19937 &cpp_gen,
                                  py::object &py_gen);
@@ -29,20 +30,23 @@ std::vector<double> list_to_vector(py::list &x);
 
 //! PYTHON
 double PythonHierarchy::like_lpdf(const Eigen::RowVectorXd &datum) const {
-    double result = py_global::like_lpdf_evaluator(datum, state.generic_state).cast<double>();
+//    auto capsule = py::capsule(&state.generic_state, [](void* v) {;});
+//    auto py_state = py::array_t<double>(state.generic_state.size(), state.generic_state.data(), capsule);
+
+    double result = py_global::like_lpdf_evaluator(datum, std::ref(state.generic_state)).cast<double>();
     return result;
 }
 
 //! PYTHON
 double PythonHierarchy::marg_lpdf(const Python::Hyperparams &params,
                                   const Eigen::RowVectorXd &datum) const {
-    double result = py_global::marg_lpdf_evaluator(datum, params.generic_hypers).cast<double>();
+    double result = py_global::marg_lpdf_evaluator(datum, std::ref(params.generic_hypers)).cast<double>();
     return result;
 }
 
 //! PYTHON
 void PythonHierarchy::initialize_state() {
-    py::list state_py = py_global::initialize_state_evaluator(hypers->generic_hypers);
+    py::list state_py = py_global::initialize_state_evaluator(std::ref(hypers->generic_hypers));
     state.generic_state = list_to_vector(state_py);
 }
 
@@ -70,7 +74,7 @@ void PythonHierarchy::update_hypers(
 Python::State PythonHierarchy::draw(const Python::Hyperparams &params) {
   Python::State out;
   synchronize_cpp_to_py_state(bayesmix::Rng::Instance().get(), py_global::py_gen);
-  py::list draw_py = py_global::draw_evaluator(state.generic_state,params.generic_hypers,py_global::py_gen);
+  py::list draw_py = py_global::draw_evaluator(std::ref(state.generic_state),std::ref(params.generic_hypers),py_global::py_gen);
   out.generic_state = list_to_vector(draw_py);
   synchronize_py_to_cpp_state(bayesmix::Rng::Instance().get(), py_global::py_gen);
   return out;
@@ -97,7 +101,7 @@ void PythonHierarchy::clear_summary_statistics() {
 Python::Hyperparams PythonHierarchy::compute_posterior_hypers() const {
     // Compute posterior hyperparameters
     Python::Hyperparams post_params;
-    py::list post_params_py = py_global::posterior_hypers_evaluator(card,hypers->generic_hypers,data_sum, data_sum_squares);
+    py::list post_params_py = py_global::posterior_hypers_evaluator(card,std::ref(hypers->generic_hypers),data_sum, data_sum_squares);
     post_params.generic_hypers = list_to_vector(post_params_py);
     return post_params;
     }

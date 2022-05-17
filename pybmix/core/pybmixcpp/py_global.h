@@ -9,6 +9,7 @@ namespace py = pybind11;
 using namespace py::literals;
 
 namespace py_global{
+    extern py::module_ opaque_module;
     extern py::module_ numpy;
     extern py::module_ fun;
     extern py::module_ numpy_random;

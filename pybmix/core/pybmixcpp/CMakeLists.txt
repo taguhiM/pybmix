@@ -4,4 +4,6 @@ target_sources(bayesmix
         python_hierarchy.cc
         py_global.h
         py_global.cc
+        opaque.h
+        opaque.cc
 )

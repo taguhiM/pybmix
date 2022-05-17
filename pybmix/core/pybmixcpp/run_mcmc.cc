@@ -6,6 +6,7 @@
 #include "pybmixcpp/bayesmix/lib/argparse/argparse.h"
 #include "includes.h"
 #include "py_global.h"
+#include "opaque.h"
 
 
 #define EMPTYSTR std::string("\"\"")

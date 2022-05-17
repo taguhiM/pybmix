@@ -17,44 +17,43 @@ def marg_lpdf(x, hypers):
     return ss.t.logpdf(x, 2 * shape, mean, sig_n)
 
 
-def initialize_state(hypers):
+def initialize_state(hypers, state):
     mean = hypers[0]
-    #    var_scaling = hypers[1]
+#    var_scaling = hypers[1]
     shape = hypers[2]
     scale = hypers[3]
-    return [mean, scale / (shape + 1)]
+
+    state.append(mean)
+    state.append(scale / (shape + 1))
 
 
-def draw(state, hypers, rng):
+def draw(state, hypers, out_state, rng):
     #    s_mean = state[0]
     s_var = state[1]
     h_mean = hypers[0]
     h_var_scaling = hypers[1]
     h_shape = hypers[2]
     h_scale = hypers[3]
-    r1 = ss.norm.rvs(h_mean, np.sqrt(s_var / h_var_scaling), random_state=rng)
-    r2 = 1 / (ss.gamma.rvs(h_shape,
-                           random_state=rng) / h_scale)  # Inverse gamma of shape=(h_shape) and rate=(1/h_scale)
-    return [r1, r2]
+    out_state.append(ss.norm.rvs(h_mean, np.sqrt(s_var / h_var_scaling), random_state=rng))
+    out_state.append(1 / (ss.gamma.rvs(h_shape,
+                           random_state=rng) / h_scale))  # Inverse gamma of shape=(h_shape) and rate=(1/h_scale)
 
 
-def compute_posterior_hypers(card, hypers, data_sum, data_sum_squares):
+def compute_posterior_hypers(card, hypers, post_params, data_sum, data_sum_squares):
     h_mean = hypers[0]
     h_var_scaling = hypers[1]
     h_shape = hypers[2]
     h_scale = hypers[3]
     if card == 0:
         return hypers
-    post_hypers = [0] * len(hypers)
     y_bar = data_sum / card
     sstat = data_sum_squares - card * (y_bar ** 2)
-    post_hypers[0] = (h_var_scaling * h_mean + data_sum) / (h_var_scaling + card)  # mean
-    post_hypers[1] = h_var_scaling + card  # var_scaling
-    post_hypers[2] = h_shape + 0.5 * card  # shape
+    post_params[0] = (h_var_scaling * h_mean + data_sum) / (h_var_scaling + card)  # mean
+    post_params[1] = h_var_scaling + card  # var_scaling
+    post_params[2] = h_shape + 0.5 * card  # shape
     num = 0.5 * h_var_scaling * card * ((y_bar - h_mean) ** 2)
     denom = card + h_var_scaling
-    post_hypers[3] = h_scale + 0.5 * sstat + num / denom  # scale
-    return post_hypers
+    post_params[3] = h_scale + 0.5 * sstat + num / denom  # scale
 
 
 def update_summary_statistics(x, add, data_sum, data_sum_squares):

@@ -46,8 +46,7 @@ double PythonHierarchy::marg_lpdf(const Python::Hyperparams &params,
 
 //! PYTHON
 void PythonHierarchy::initialize_state() {
-    py::list state_py = py_global::initialize_state_evaluator(std::ref(hypers->generic_hypers));
-    state.generic_state = list_to_vector(state_py);
+    py_global::initialize_state_evaluator(std::ref(hypers->generic_hypers), std::ref(state.generic_state));
 }
 
 //! C++
@@ -72,19 +71,19 @@ void PythonHierarchy::update_hypers(
 
 //! PYTHON
 Python::State PythonHierarchy::draw(const Python::Hyperparams &params) {
-  Python::State out;
-  synchronize_cpp_to_py_state(bayesmix::Rng::Instance().get(), py_global::py_gen);
-  py::list draw_py = py_global::draw_evaluator(std::ref(state.generic_state),std::ref(params.generic_hypers),py_global::py_gen);
-  out.generic_state = list_to_vector(draw_py);
-  synchronize_py_to_cpp_state(bayesmix::Rng::Instance().get(), py_global::py_gen);
-  return out;
+    Python::State out;
+    synchronize_cpp_to_py_state(bayesmix::Rng::Instance().get(), py_global::py_gen);
+    py_global::draw_evaluator(std::ref(state.generic_state), std::ref(params.generic_hypers),
+                              std::ref(out.generic_state), py_global::py_gen);
+    synchronize_py_to_cpp_state(bayesmix::Rng::Instance().get(), py_global::py_gen);
+    return out;
 }
 
 
 //! PYTHON
 void PythonHierarchy::update_summary_statistics(
         const Eigen::RowVectorXd &datum, const bool add) {
-    py::list sum_stats_py = py_global::update_summary_statistics_evaluator(datum,add,data_sum, data_sum_squares);
+    py::list sum_stats_py = py_global::update_summary_statistics_evaluator(datum, add, data_sum, data_sum_squares);
     data_sum = sum_stats_py[0].cast<double>();
     data_sum_squares = sum_stats_py[1].cast<double>();
 }
@@ -101,10 +100,12 @@ void PythonHierarchy::clear_summary_statistics() {
 Python::Hyperparams PythonHierarchy::compute_posterior_hypers() const {
     // Compute posterior hyperparameters
     Python::Hyperparams post_params;
-    py::list post_params_py = py_global::posterior_hypers_evaluator(card,std::ref(hypers->generic_hypers),data_sum, data_sum_squares);
-    post_params.generic_hypers = list_to_vector(post_params_py);
+    post_params.generic_hypers = std::vector<double>(hypers->generic_hypers.size(),0);
+    py_global::posterior_hypers_evaluator(card, std::ref(hypers->generic_hypers),
+                                          std::ref(post_params.generic_hypers), data_sum,
+                                          data_sum_squares);
     return post_params;
-    }
+}
 
 
 //! C++

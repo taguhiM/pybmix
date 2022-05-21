@@ -9,7 +9,7 @@ set(CMAKE_FIND_PACKAGE_PREFER_CONFIG TRUE)
 
 
 SET(SOURCE_DIR "${CMAKE_CURRENT_LIST_DIR}/pybmix/core/pybmixcpp")
-add_subdirectory(${SOURCE_DIR}/bayesmix)
+add_subdirectory(${SOURCE_DIR}/safety)
 include_directories(${SOURCE_DIR})
 SET_SOURCE_FILES_PROPERTIES(${PROTO_HEADERS} ${PROTO_SOURCES} PROPERTIES GENERATED TRUE)
 
@@ -34,7 +34,7 @@ foreach(PROTO_FILE IN LISTS ProtoFiles)
   message(STATUS "GENERATING PYTHON protoc proto(cc): ${PROTO_FILE} --> ${PROTO_PY}")
   add_custom_command(
     OUTPUT ${PROTO_PY}
-    COMMAND protobuf::protoc "--proto_path=${SOURCE_DIR}/bayesmix/src/proto"
+    COMMAND protobuf::protoc "--proto_path=${SOURCE_DIR}/safety/bayesmix/src/proto"
     ${PROTO_DIRS} "--python_out=${PY_PROTO_DIR}" ${PROTO_FILE}
     DEPENDS ${PROTO_FILE} protobuf::protoc
     COMMENT "Generate Python protocol buffer for ${PROTO_FILE}"

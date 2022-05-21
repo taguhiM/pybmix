@@ -1,0 +1,12 @@
+add_subdirectory(bayesmix)
+target_sources(bayesmix
+                PUBLIC
+                python_hierarchy.h
+                python_hierarchy.cc
+                py_global.h
+                py_global.cc
+                load_hierarchies_2.h
+                includes.h
+                run_mcmc.cc
+                plot_mcmc.cc
+                )

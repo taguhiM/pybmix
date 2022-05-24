@@ -21,6 +21,13 @@ pybind11_add_module(pybmixcpp ${SOURCES}
     "${SOURCE_DIR}/algorithm_wrapper.cpp"
     "${SOURCE_DIR}/serialized_collector.hpp"
     "${SOURCE_DIR}/serialized_collector.cpp"
+    "${SOURCE_DIR}/load_hierarchies_2.h"
+    "${SOURCE_DIR}/includes.h"
+    "${SOURCE_DIR}/python_hierarchy.h"
+    "${SOURCE_DIR}/python_hierarchy.cc"
+    "${SOURCE_DIR}/py_global.h"
+    "${SOURCE_DIR}/py_global.cc"
+    #"${SOURCE_DIR}/run_mcmc.cc"
     ${PROTO_HEADERS} ${PROTO_SOURCES})
 
 # generate Python's proto classes

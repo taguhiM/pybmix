@@ -8,7 +8,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 from pybmix.core.mixing import DirichletProcessMixing
 from pybmix.core.hierarchy import PythonHierarchy
+print(1)
 from pybmix.core.mixture_model import MixtureModel
+print(2)
 np.random.seed(2021)
 
 

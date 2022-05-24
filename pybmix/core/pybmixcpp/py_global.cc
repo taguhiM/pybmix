@@ -1,7 +1,7 @@
 #include "py_global.h"
 
 namespace py_global{
-    py::scoped_interpreter guard{};
+//    py::scoped_interpreter guard{};
     py::module_ numpy = py::module_::import("numpy");
     py::module_ fun = py::module_::import("fun");
     py::module_ numpy_random = py::module_::import("numpy.random");

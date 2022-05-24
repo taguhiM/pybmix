@@ -14,7 +14,7 @@
 #include "algorithm_state.pb.h"
 #include "hierarchy_prior.pb.h"
 #include "ls_state.pb.h"
-#include "pybmixcpp/bayesmix/src/utils/rng.h"
+#include "bayesmix/src/utils/rng.h"
 #include "py_global.h"
 #include "pybind11/stl.h"
 #include "pybind11/eigen.h"

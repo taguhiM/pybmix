@@ -24,6 +24,8 @@ def initialize_state(hypers):
     scale = hypers[3]
     return [mean, scale / (shape + 1)]
 
+def initialize_hypers():
+    return [1,1,1,1]
 
 def draw(state, hypers, rng):
     #    s_mean = state[0]

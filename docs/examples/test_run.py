@@ -7,7 +7,7 @@ sys.path.insert(0, os.path.realpath(BUILD_DIR))
 import numpy as np
 import matplotlib.pyplot as plt
 from pybmix.core.mixing import DirichletProcessMixing
-from pybmix.core.hierarchy import PythonHierarchy
+from pybmix.core.hierarchy import Python
 from pybmix.core.mixture_model import MixtureModel
 np.random.seed(2021)
 
@@ -25,7 +25,7 @@ plt.hist(y)
 plt.show()
 
 mixing = DirichletProcessMixing(total_mass=5)
-hierarchy = PythonHierarchy()
+hierarchy = Python()
 hierarchy.make_default_fixed_params(y, 2)
 mixture = MixtureModel(mixing, hierarchy)
 

@@ -121,7 +121,8 @@ class PythonHierarchyNonConjugate
   //! NON-CONJUGATE
 
   //! Set of values of data points belonging to this cluster
-  std::list<Eigen::RowVectorXd> cluster_data_values;
+  // std::list<Eigen::RowVectorXd> cluster_data_values;
+  Eigen::MatrixXd cluster_data_values;
 
     //! Samples from the proposal distribution using Random Walk
   //! Metropolis-Hastings

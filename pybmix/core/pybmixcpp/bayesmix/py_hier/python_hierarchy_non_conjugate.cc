@@ -85,10 +85,15 @@ void PythonHierarchyNonConjugate::update_summary_statistics(
     */
     py::list results = update_summary_statistics_evaluator(datum,add,sum_stats, state.generic_state, cluster_data_values);
     py::list sum_stats_py = results[0];
-    py::list cluster_data_values_py = results[1];
+    py::array cluster_data_values_py = results[1];
     sum_stats = list_to_vector(sum_stats_py);
-    cluster_data_values = list_to_vector(cluster_data_values_py);
-
+    // cluster_data_values = list_to_list_eigen(cluster_data_values_py);
+    cluster_data_values = cluster_data_values_py.cast<Eigen::MatrixXd>();
+    /*
+    // try passing by reference (as done in algorithm_wrapper more or less?)
+    py::list sum_stats_py = update_summary_statistics_evaluator(datum,add,sum_stats, state.generic_state, & cluster_data_values);
+    sum_stats = list_to_vector(sum_stats_py);
+    */
 }
 
 //! PYTHON
@@ -159,7 +164,7 @@ PythonHierarchyNonConjugate::get_hypers_proto() const {
     out->mutable_python_state()->CopyFrom(hypers_);
     return out;
 }
-
+/*
 void synchronize_cpp_to_py_state(const std::mt19937 &cpp_gen,
                                  py::object &py_gen) {
     std::stringstream state{};
@@ -196,8 +201,8 @@ void synchronize_py_to_cpp_state(std::mt19937 &cpp_gen,
     ss_state_ << pos_;
     ss_state_ >> cpp_gen;
 }
-
-
+*/
+/*
 std::vector<double> list_to_vector(py::list &x) {
     unsigned int size = x.size();
     std::vector<double> v(size);
@@ -206,7 +211,7 @@ std::vector<double> list_to_vector(py::list &x) {
     }
     return v;
 }
-
+*/
 //! NON-CONJUGATE
 
 //! PYTHON
@@ -215,16 +220,14 @@ void PythonHierarchyNonConjugate::sample_full_cond(const bool update_params /*= 
     // No posterior update possible
     this->sample_prior();
   } else {
-    unsigned int iter = 0;
-    unsigned int accepted = 0;
     synchronize_cpp_to_py_state(bayesmix::Rng::Instance().get(), py_gen);
-    py::list result = sample_full_cond_evaluator(iter, accepted, state.generic_state, sum_stats, py_gen, cluster_data_values, hypers->generic_hypers);
+    py::list result = sample_full_cond_evaluator(state.generic_state, sum_stats, py_gen, cluster_data_values, hypers->generic_hypers);
     synchronize_py_to_cpp_state(bayesmix::Rng::Instance().get(), py_gen);
     // std::vector<double> result_vec = list_to_vector(result);
     // iter_ = result[0].cast<unsigned int>();
     // accepted_ = result[1].cast<unsigned int>();
-    py::list state_list = result[2];
-    py::list sum_stats_list = result[3];
+    py::list state_list = result[0];
+    py::list sum_stats_list = result[1];
     state.generic_state = list_to_vector(state_list);
     sum_stats = list_to_vector(sum_stats_list);
     }

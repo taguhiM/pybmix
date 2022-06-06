@@ -48,3 +48,23 @@ std::vector<double> list_to_vector(py::list &x) {
     }
     return v;
 }
+
+
+std::list<Eigen::RowVectorXd> list_to_list_eigen(py::list &x){
+    unsigned int size = x.size();
+    std::list<Eigen::RowVectorXd> vec_list;
+    for (unsigned int i = 0; i < size; ++i) {
+        py::array_t<double> arr = x[i].cast<py::array_t<double>>();
+        py::buffer_info buf = arr.request();
+        double *x = (double *) buf.ptr;
+        unsigned int size_arr = arr.size();
+        Eigen::RowVectorXd vec(size_arr);
+        if(size_arr > 0){
+            for (unsigned int j = 0; j < size_arr; ++j){
+                vec(j) = x[j];
+            }
+        }
+        vec_list.push_back(vec);
+    }
+    return vec_list;
+}

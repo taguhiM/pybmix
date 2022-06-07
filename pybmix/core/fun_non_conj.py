@@ -6,7 +6,7 @@ def like_lpdf(x, state):
     # print("*************** fun1 - like_lpdf *************")
     mean = state[0]
     scale = state[1]
-    return ss.laplace.pdf(x, mean, scale)
+    return ss.laplace.logpdf(x, mean, scale)
 
 
 def initialize_state(hypers):
@@ -24,15 +24,16 @@ def initialize_hypers():
 
 def draw(state, hypers, rng):
     # print("*************** fun1 - draw *************")
-    r1 = ss.norm.rvs(hypers[0], np.sqrt(hypers[3]), random_state=rng)
+    r1 = ss.norm.rvs(hypers[0], np.sqrt(hypers[1]), random_state=rng)
     r2 = ss.invgamma.rvs(hypers[2], 1 / hypers[3], random_state=rng)
 
-    return [r1, r2]
+    return [r1, r2]  # mean, scale
 
 
 def update_summary_statistics(x, add, sum_stats, state, cluster_data_values):
     # print("*************** fun1 - update_summary_statistics*************")
-    # print(cluster_data_values)
+    # print("x: ",type(x))
+    # print(type(cluster_data_values))
     if not len(sum_stats):
         sum_stats = [0, 0]
     if add:
@@ -41,7 +42,7 @@ def update_summary_statistics(x, add, sum_stats, state, cluster_data_values):
     else:
         sum_stats[0] -= abs(state[0] - x[0])
         ind = np.where(cluster_data_values == x)
-        np.delete(cluster_data_values, ind)
+        cluster_data_values = np.delete(cluster_data_values, ind)
     # print(cluster_data_values)
     return [sum_stats, cluster_data_values]
 
@@ -75,8 +76,8 @@ def propose_rwmh(curr_vals, hypers, rng):
     # print("*************** fun1 - propose_rwmh *************")
     # print(len(curr_vals))
     # print(len(hypers))
-    candidate_mean = curr_vals[0] + ss.norm.rvs(0, np.sqrt(hypers[5]), size=1, random_state=rng)
-    candidate_log_scale = curr_vals[1] + ss.norm.rvs(0, np.sqrt(hypers[4]), size=1, random_state=rng)
+    candidate_mean = curr_vals[0] + ss.norm.rvs(0, np.sqrt(hypers[4]), size=1, random_state=rng)
+    candidate_log_scale = curr_vals[1] + ss.norm.rvs(0, np.sqrt(hypers[5]), size=1, random_state=rng)
     proposal = [candidate_mean, candidate_log_scale]
     return proposal
 
@@ -86,8 +87,9 @@ def eval_prior_lpdf_unconstrained(unconstrained_parameters, hypers):
     mu = unconstrained_parameters[0]
     log_scale = unconstrained_parameters[1]
     scale = np.exp(log_scale)
-    return ss.norm.logpdf(mu, hypers[0], np.sqrt(hypers[1])) + ss.invgamma.logpdf(scale, a=hypers[2], loc=0,
-                                                                               scale=hypers[3]) + log_scale
+    return ss.norm.logpdf(mu, hypers[0], np.sqrt(hypers[1])) + \
+           ss.invgamma.logpdf(scale, a=hypers[2], loc=0, scale=hypers[3]) + \
+           log_scale
 
 
 def eval_like_lpdf_unconstrained(unconstrained_parameters, is_current, sum_stats, cluster_data_values):

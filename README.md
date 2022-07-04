@@ -1,24 +1,46 @@
-# pybmix: Bayesian Mixture Models in Python
-
-A Python interface to [bayesmix](https://github.com/bayesmix-dev/bayesmix/)
-
-
 ## Installation
 
-First, clone this repository with its submodules
-```shell
-git clone --recurse-submodule git@github.com:bayesmix-dev/pybmix.git
+1. install ```cmake>=3.21.0``` from source following the official documentation
+2. install ```libtbb-dev=2020.1-2``` (e.g. for Linux ```sudo apt install libtbb-dev=2020.1-2```)
+
+3. clone the repository
 ```
-Ideally things should work by simply typing
-```shell
-pip3 install -e .
+git clone --recurse-submodules git@github.com:taguhiM/pybmix.git
 ```
-from the root folder of this repo.
 
-## Getting Started
+4. setup a python environment with ```python=3.9``` and install the following packages with ```pip```
+```
+pip3 install numpy==1.22.4 scipy==1.7.3 matplotlib==3.5.2 2to3==1.0
+```
 
-See our [tutorials](https://pybmix.readthedocs.io/en/docs/)!
+5. install ```protobuf==3.14.0``` and ```libprotobuf=3.14.0``` (e.g. ```conda install protobuf==3.14.0``` will install both)
 
-## Contributing
 
-Just get in touch with us (email in setup.cfg), open a PR or an Issue! 
+6. add the path for ```2to3``` to the ```PATH``` environment variable, e.g.
+```
+export PYTHONPATH="path/to/2to3/"
+```
+
+7. finally, to build the library
+```
+./build_pybmix.sh build
+```
+
+Note that, the argument ```build``` substitutes ```mkdir build```, thus you can skip it in subsequent builds if only the
+new changes need to be compiled.
+
+## To implement a hierarchy in Python
+
+Create a ```.py``` file implementing all the necessary methods of the hierarchy,
+you can find examples in  ```docs/examples```. Specifically:
+
+- to implement a non-conjugate hierarchy you need to define the
+  methods: ```is_conjugate, like_lpdf, initialize_state, initialize_hypers,
+  update_hypers, draw, update_summary_statistics, sample_full_cond```. Please refer to the ```LapNIG_Hierarchy.py```
+  example for details.
+- to implement a conjugate hierarchy you need to define the
+  methods: ```is_conjugate, like_lpdf, marg_lpdf, initialize_state,
+  initialize_hypers, update_hypers, draw, compute_posterior_hypers,
+  update_summary_statistics```. Please refer to the ```NNIG_Hierarchy_NGG.py``` examples for details.
+
+For an example of how to run please refer to ```test_run.py```, ```estimate_pyhier_desnity.ipynb```.

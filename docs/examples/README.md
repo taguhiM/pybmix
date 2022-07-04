@@ -5,7 +5,7 @@
 
 3. clone the repository
 ```
-git clone --recurse-submodules git@github.com:bayesmix-dev/pybmix.git
+git clone --recurse-submodules git@github.com:taguhiM/pybmix.git
 ```
 
 4. setup a python environment with ```python=3.9``` and install the following packages with ```pip```
